@@ -9,6 +9,7 @@ public class MainScreen implements ActionListener {
     private JTextField addIPTextField;
     private JTextField addInterfaceTextField;
     private JTextField routeIPTextField;
+    private JLabel routeResultLabel;
     private Map<String, String> routingTable;
     private DefaultTableModel tableModel;
 
@@ -43,10 +44,12 @@ public class MainScreen implements ActionListener {
         JLabel routeIPLabel = new JLabel("Test an IPv4 address to see which interface it routes to.");
         routeIPTextField = new JTextField("192.53.40.7");
         JButton routeButton = new JButton("Route");
+        routeResultLabel = new JLabel();
         routeButton.addActionListener(this);
         routePanel.add(routeIPLabel);
         routePanel.add(routeIPTextField);
         routePanel.add(routeButton);
+        routePanel.add(routeResultLabel);
 
         frame.add(routingTablePanel, BorderLayout.CENTER);
         frame.add(routePanel, BorderLayout.SOUTH);
@@ -65,7 +68,7 @@ public class MainScreen implements ActionListener {
         } else if (e.getActionCommand().equals("Clear")) {
             this.resetTable();
         } else if (e.getActionCommand().equals("Route")) {
-            // TODO: input validation and call route function
+            routeResultLabel.setText(RoutingService.route(routeIPTextField.getText(), routingTable));
         }
     }
 
