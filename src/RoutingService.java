@@ -39,7 +39,7 @@ public class RoutingService {
             }
         }
 
-        String nextHop = "Default";
+        String nextHop = "Router 2";
         long max = Long.MIN_VALUE;
         for (String key : matches) {
             if (ipToMaskMap.get(key) > max) {

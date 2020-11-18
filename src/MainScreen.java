@@ -62,9 +62,10 @@ public class MainScreen implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         System.out.println(e.getActionCommand());
         if (e.getActionCommand().equals("Add")) {
-            // TODO: input validation. Input must be IPv4 CIDR notation
+            // TODO: input validation + no duplicate addresses. Input must be IPv4 CIDR notation
             String[] newRow = {addIPTextField.getText(), addInterfaceTextField.getText()};
             tableModel.addRow(newRow);
+            routingTable.put(addIPTextField.getText(), addInterfaceTextField.getText());
         } else if (e.getActionCommand().equals("Clear")) {
             this.resetTable();
         } else if (e.getActionCommand().equals("Route")) {
