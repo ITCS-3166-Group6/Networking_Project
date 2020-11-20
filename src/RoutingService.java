@@ -1,16 +1,9 @@
 import java.util.*;
 
-
 public class RoutingService {
 
-
-    //default constructor
-    public RoutingService() {
-
-    }
-
     public static String route(String inputIPv4Address, Map<String, String> table) {
-        long inputIPNum = convertIPv4toDec(inputIPv4Address);
+        long inputIPNum = ipv4ToDecimal(inputIPv4Address);
 
         // parse through routing table for IPs
         List<String> matches = new ArrayList<>();
@@ -20,8 +13,7 @@ public class RoutingService {
                 continue;
 
             String[] splitStrings = key.split("/");
-            System.out.println(splitStrings[0]);
-            long decimalRepOfIP = convertIPv4toDec(splitStrings[0]);
+            long decimalRepOfIP = ipv4ToDecimal(splitStrings[0]);
             long decimalRepOfMask = Long.parseLong(splitStrings[1]);
             ipToMaskMap.put(key, decimalRepOfMask);
 
@@ -39,7 +31,7 @@ public class RoutingService {
             }
         }
 
-        String nextHop = "Router 2";
+        String nextHop = table.get("Default");
         long max = Long.MIN_VALUE;
         for (String key : matches) {
             if (ipToMaskMap.get(key) > max) {
@@ -47,21 +39,18 @@ public class RoutingService {
                 nextHop = table.get(key);
             }
         }
+
         return nextHop;
     }
 
-    private static long convertIPv4toDec(String ip) {
-        //Creating a decimal representation of the String ip inputted for routing
-        String[] ipAddressInArray = ip.split("\\.");
-        long result = 0;
-        for (int i = 0; i < ipAddressInArray.length; i++) {
-
-            int ipInt = Integer.parseInt(ipAddressInArray[i]);
+    private static long ipv4ToDecimal(String ip) {
+        String[] ipBytes = ip.split("\\.");
+        long decimalRep = 0;
+        for (int i = 0; i < ipBytes.length; i++) {
+            int ipInt = Integer.parseInt(ipBytes[i]);
             int power = 3 - i;
-            //Decimal representation of IP address
-            result += ipInt * Math.pow(256, power);
-
+            decimalRep += ipInt * Math.pow(256, power);
         }
-        return result;
+        return decimalRep;
     }
 }

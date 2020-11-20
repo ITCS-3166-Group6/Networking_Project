@@ -19,7 +19,6 @@ public class MainScreen implements ActionListener {
         /* Routing Table Panel */
         JPanel routingTablePanel = new JPanel();
         routingTablePanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
-        JLabel routingTableLabel = new JLabel("Routing Table");
         routingTable = new LinkedHashMap<>();
         this.populateTable();
         JTable jTable = new JTable(tableModel);
@@ -27,49 +26,58 @@ public class MainScreen implements ActionListener {
         JButton clearButton = new JButton("Clear");
         clearButton.addActionListener(this);
         routingTablePanel.setLayout(new FlowLayout());
-        routingTablePanel.add(routingTableLabel);
         routingTablePanel.add(routingTableScrollBar);
         routingTablePanel.add(clearButton);
-        JLabel addAddressLabel = new JLabel("Add IPv4 address in CIDR notation and Interface to routing table");
-        addIPTextField = new JTextField("135.46.56.0/22");
-        addInterfaceTextField = new JTextField("Interface 0");
+        JLabel addAddressLabel = new JLabel("<html>Add IPv4 address in CIDR notation and Interface to routing table.<br>Duplicate address/mask is not allowed</html>", JLabel.RIGHT);
+        addIPTextField = new JTextField("145.90.56.0/22");
+        addInterfaceTextField = new JTextField("Interface 2");
         JButton addButton = new JButton("Add");
         addButton.addActionListener(this);
         routingTablePanel.add(addAddressLabel);
         routingTablePanel.add(addIPTextField);
         routingTablePanel.add(addInterfaceTextField);
         routingTablePanel.add(addButton);
+        routingTablePanel.setBackground(new Color(146,229,214));
 
+        /* test IP Panel */
         JPanel routePanel = new JPanel();
-        JLabel routeIPLabel = new JLabel("Test an IPv4 address to see which interface it routes to.");
+        JLabel routeIPLabel = new JLabel("Test an IPv4 address to see its next hop!");
         routeIPTextField = new JTextField("192.53.40.7");
         JButton routeButton = new JButton("Route");
-        routeResultLabel = new JLabel();
+        routeResultLabel = new JLabel("Destination: __");
         routeButton.addActionListener(this);
         routePanel.add(routeIPLabel);
         routePanel.add(routeIPTextField);
         routePanel.add(routeButton);
         routePanel.add(routeResultLabel);
+        routePanel.setBackground(Color.CYAN);
 
         frame.add(routingTablePanel, BorderLayout.CENTER);
         frame.add(routePanel, BorderLayout.SOUTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
+        frame.setBackground(Color.CYAN);
         frame.setVisible(true);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println(e.getActionCommand());
-        if (e.getActionCommand().equals("Add")) {
-            // TODO: input validation + no duplicate addresses. Input must be IPv4 CIDR notation
-            String[] newRow = {addIPTextField.getText(), addInterfaceTextField.getText()};
-            tableModel.addRow(newRow);
-            routingTable.put(addIPTextField.getText(), addInterfaceTextField.getText());
-        } else if (e.getActionCommand().equals("Clear")) {
+        String actionCommand = e.getActionCommand();
+        if (actionCommand.equals("Add")) {
+            String inputIP = addIPTextField.getText();
+            boolean validCIDR = inputIP.matches("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(3[0-2]|[1-2][0-9]|[0-9]))$");
+            if (validCIDR && !routingTable.containsKey(inputIP)) {
+                String[] newRow = {inputIP, addInterfaceTextField.getText()};
+                tableModel.addRow(newRow);
+                routingTable.put(inputIP, addInterfaceTextField.getText());
+                addIPTextField.setBackground(Color.WHITE);
+            } else {
+                addIPTextField.setBackground(Color.RED);
+            }
+        } else if (actionCommand.equals("Clear")) {
             this.resetTable();
-        } else if (e.getActionCommand().equals("Route")) {
-            routeResultLabel.setText(RoutingService.route(routeIPTextField.getText(), routingTable));
+        } else if (actionCommand.equals("Route")) {
+            routeResultLabel.setText("Destination: " + RoutingService.route(routeIPTextField.getText(), routingTable));
         }
     }
 
